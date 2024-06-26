@@ -5,11 +5,12 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 class JfrEventLifecycle implements SmartLifecycle {
-
+    private static final String VIRTUAL_THREAD_PINNED_JFR_EVENT_NAME = "jdk.VirtualThreadPinned";
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private final JfrVirtualThreadPinnedEventHandler virtualThreadPinnedEventHandler;
@@ -22,25 +23,24 @@ class JfrEventLifecycle implements SmartLifecycle {
 
     @Override
     public void start() {
-        if (!isRunning()) {
+        if (running.compareAndSet(false, true)) {
             recordingStream = new RecordingStream();
-
-            recordingStream.enable("jdk.VirtualThreadPinned").withStackTrace();
-            recordingStream.onEvent("jdk.VirtualThreadPinned", virtualThreadPinnedEventHandler::handle);
-
-            // prevents memory leaks in long-running apps
-            recordingStream.setMaxAge(Duration.ofSeconds(10));
-
+            recordingStream.enable(VIRTUAL_THREAD_PINNED_JFR_EVENT_NAME)
+                    .withStackTrace()
+                    .withThreshold(Duration.ofMillis(1));
+            recordingStream.onEvent(VIRTUAL_THREAD_PINNED_JFR_EVENT_NAME, virtualThreadPinnedEventHandler::handle);
+            recordingStream.setReuse(true);
+            recordingStream.setMaxAge(Duration.ofSeconds(5));
             recordingStream.startAsync();
-            running.set(true);
+
+            virtualThreadPinnedEventHandler.initializePrintDetailsThread();
         }
     }
 
     @Override
     public void stop() {
-        if (isRunning()) {
+        if (running.compareAndSet(true, false)) {
             recordingStream.close();
-            running.set(false);
         }
     }
 
@@ -49,4 +49,8 @@ class JfrEventLifecycle implements SmartLifecycle {
         return running.get();
     }
 
+    @Override
+    public int getPhase() {
+        return 0;
+    }
 }

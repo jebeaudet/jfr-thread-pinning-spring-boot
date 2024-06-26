@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/pinning")
@@ -17,25 +18,21 @@ class ThreadPinningController {
     private static final Logger log = LoggerFactory.getLogger(ThreadPinningController.class);
 
     @PostMapping
-    void pinCarrierThread() throws InterruptedException {
-        var cdl = new CountDownLatch(1);
+    void pinCarrierThread()  {
         Thread.ofVirtual()
                 .name("web-vt-" + UUID.randomUUID())
                 .start(() -> {
                     synchronized (this) {
-                        log.info("Causing thread pinning for example purposes");
                         sleep(Duration.ofMillis(250));
                     }
-                    cdl.countDown();
                 });
-        cdl.await();
     }
 
     private void sleep(Duration duration) {
         try {
             Thread.sleep(duration.toMillis());
         } catch (InterruptedException e) {
-            throw new IllegalStateException("Unexpected InterruptedException", e);
+            Thread.currentThread().interrupt();
         }
     }
 
