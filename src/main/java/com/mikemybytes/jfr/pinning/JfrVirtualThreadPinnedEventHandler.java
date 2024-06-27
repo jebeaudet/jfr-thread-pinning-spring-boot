@@ -71,7 +71,9 @@ class JfrVirtualThreadPinnedEventHandler {
                     startTime,
                     stackTrace
             );
-            pinnedDetails.add(eventDetails);
+            if (pinnedDetails.size() < 100) {
+                pinnedDetails.add(eventDetails);
+            }
         }
     }
 

@@ -15,25 +15,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping("/pinning")
 class ThreadPinningController {
 
-    private static final Logger log = LoggerFactory.getLogger(ThreadPinningController.class);
-
     @PostMapping
     void pinCarrierThread()  {
         Thread.ofVirtual()
-                .name("web-vt-" + UUID.randomUUID())
                 .start(() -> {
                     synchronized (this) {
-                        sleep(Duration.ofMillis(250));
+                        sleep(5);
                     }
                 });
     }
 
-    private void sleep(Duration duration) {
+    private void sleep(long duration) {
         try {
-            Thread.sleep(duration.toMillis());
+            Thread.sleep(duration);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
-
 }
