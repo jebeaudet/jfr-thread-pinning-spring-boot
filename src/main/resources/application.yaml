@@ -2,8 +2,10 @@ spring:
   application:
     name: jfr-thread-pinning-spring-boot
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: [ "prometheus" ]
+snowflake:
+  url: qj96976.us-east-2.aws.snowflakecomputing.com
+  username: JFR_TEST
+  schema: JFR_TEST
+  warehouse: COMPUTE_WH
+  role: JFR_ROLE
+  database: JFR_LEAK_TEST

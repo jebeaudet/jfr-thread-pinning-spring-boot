@@ -12,7 +12,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,7 +70,7 @@ public class SnowflakeDummyJob implements DisposableBean {
     private Row[] getData() {
         String randomData = UUID.randomUUID().toString();
         var data = new Object[]{randomData, randomData, randomData,
-                LocalDateTime.now().toString(), LocalDateTime.now().toString(),
+                OffsetDateTime.now(ZoneOffset.UTC).toString(), OffsetDateTime.now(ZoneOffset.UTC).toString(),
                 "{}"};
 
         return new Row[]{new Row(data)};
