@@ -1,6 +1,6 @@
 spring:
   application:
-    name: jfr-thread-pinning-spring-boot
+    name: jfr-native-memory-leak
 
 snowflake:
   url: qj96976.us-east-2.aws.snowflakecomputing.com
