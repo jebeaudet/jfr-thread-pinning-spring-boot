@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 class JfrEventLifecycle implements SmartLifecycle {
-    private static final String JFR_EVENT_KEY = "potato";
+    private static final String JFR_EVENT_KEY = "jdk.VirtualThreadPinned";
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private final JfrVirtualThreadPinnedEventHandler virtualThreadPinnedEventHandler;
