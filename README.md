@@ -1,6 +1,6 @@
 # Sample project to reproduce a native memory leak for https://bugs.openjdk.org/browse/JDK-8335121
 
-This repository present a complete sample to reproduce a native memory leak when using JFR and the snowflake jdbc driver. *It's important to note that while the example use the thread pinning events, the leak can be triggered by any event, existing or non existing.*
+This repository present a complete sample to reproduce a native memory leak when using JFR and the snowflake jdbc driver. **It's important to note that while the example use the thread pinning events, the leak can be triggered by any event, existing or non existing.**
 
 ## High level overview
 This application is a standard Spring Boot application with 4 main components : 
