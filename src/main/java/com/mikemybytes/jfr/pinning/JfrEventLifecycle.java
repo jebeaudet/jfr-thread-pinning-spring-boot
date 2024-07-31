@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 class JfrEventLifecycle implements SmartLifecycle {
-    private static final String VIRTUAL_THREAD_PINNED_JFR_EVENT_NAME = "jdk.VirtualThreadPinned";
+    private static final String JFR_EVENT_KEY = "potato";
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private final JfrVirtualThreadPinnedEventHandler virtualThreadPinnedEventHandler;
@@ -25,10 +25,10 @@ class JfrEventLifecycle implements SmartLifecycle {
     public void start() {
         if (running.compareAndSet(false, true)) {
             recordingStream = new RecordingStream();
-            recordingStream.enable(VIRTUAL_THREAD_PINNED_JFR_EVENT_NAME)
+            recordingStream.enable(JFR_EVENT_KEY)
                     .withStackTrace()
                     .withThreshold(Duration.ofMillis(1));
-            recordingStream.onEvent(VIRTUAL_THREAD_PINNED_JFR_EVENT_NAME, virtualThreadPinnedEventHandler::handle);
+            recordingStream.onEvent(JFR_EVENT_KEY, virtualThreadPinnedEventHandler::handle);
             recordingStream.setReuse(true);
             recordingStream.setMaxAge(Duration.ofSeconds(5));
             recordingStream.startAsync();

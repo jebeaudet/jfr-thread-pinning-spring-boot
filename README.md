@@ -1,6 +1,6 @@
 # Sample project to reproduce a native memory leak for https://bugs.openjdk.org/browse/JDK-8335121
 
-This repository present a complete sample to reproduce a native memory leak when using JFR with thread pinning events and the snowflake jdbc driver.
+This repository present a complete sample to reproduce a native memory leak when using JFR and the snowflake jdbc driver. *It's important to note that while the example use the thread pinning events, the leak can be triggered by any event, existing or non existing.*
 
 ## High level overview
 This application is a standard Spring Boot application with 4 main components : 
@@ -8,6 +8,10 @@ This application is a standard Spring Boot application with 4 main components :
 - A JFR event listener listening on thread pinned events implemented in `JfrEventLifecycle`
 - A component to print pinned thread details to a temp file implemented in `JfrVirtualThreadPinnedEventHandler`
 - A native memory tracker implemented in `NativeMemoryTracker` to easily and in a self-contained way track native memory
+
+`JfrVirtualThreadPinnedEventHandler` is here to make sure that the JIT compiler does not get rid of any unused code but it's actually unused since there are no thread pinned event.
+
+As mentioned earlier, this leak can be triggered with any JFR event, existing or non existing. To prove this, you can change the `JFR_EVENT_KEY` constant in the `JfrEventLifecycle` class to `foo` and the leak will present itself.
 
 ### Native memory tracking
 Since this is a relatively slow leak, I wanted to automate the native memory tracking over time.
@@ -47,4 +51,4 @@ grep -r "Tracing (" .| sort -n
 ./jfr-leak-diff-2024-07-03T11:06:47:- Tracing (reserved=16867KB +1274KB, committed=16867KB +1274KB)
 ```
 
-The triggering condition is the use of the library `snowflake-jdbc` which uses Apache Arrow under the hood. This library uses `ByteBuffer` [around here](https://github.com/apache/arrow/blob/main/java/memory/memory-core/src/main/java/org/apache/arrow/memory/util/MemoryUtil.java#L55) in a "non safe way" since it requires a `add-opens`.
+The triggering condition is the use of the library `snowflake-jdbc` which uses Apache Arrow under the hood. FWIW, this library uses `ByteBuffer` [around here](https://github.com/apache/arrow/blob/main/java/memory/memory-core/src/main/java/org/apache/arrow/memory/util/MemoryUtil.java#L55) in a "non safe way" since it requires a `add-opens`. It might or might not be related, it's hard for me to say.
