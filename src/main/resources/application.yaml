@@ -3,7 +3,7 @@ spring:
     name: jfr-native-memory-leak
 
 snowflake:
-  url: qj96976.us-east-2.aws.snowflakecomputing.com
+  url: hihbbpj-ng80025.snowflakecomputing.com
   username: JFR_TEST
   schema: JFR_TEST
   warehouse: COMPUTE_WH
